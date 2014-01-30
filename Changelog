@@ -1,0 +1,3 @@
+2014-01-30 Matt:
+	* Saving some tree structure that is working so far.  Will build this analysis up as needed.
+	* Main reason to use the trees is it is faster analysis compared with simple python script.
