@@ -24,10 +24,11 @@ class Particle : public TObject
   
   // Constructor
   Particle(){};
-  Particle(int partID, fVector e, fVector x, fVector y, fVector z){
+  Particle(int partID, int trkID, fVector e, fVector x, fVector y, fVector z){
     clear();
 
     m_partID = partID;
+    m_trkID  = trkID;
     m_energy = e;
     m_x = x;
     m_y = y;
@@ -57,6 +58,7 @@ class Particle : public TObject
   fVector getY(){ return m_y; };
   fVector getZ(){ return m_z; };
   int getPartID(){ return m_partID; };
+  int getTrkID(){  return m_trkID; };
 
   // Clear method
   void clear(){
@@ -65,6 +67,7 @@ class Particle : public TObject
     m_y.clear();
     m_z.clear();
     m_partID = -1;
+    m_trkID  = -1;
   };
 
   ClassDef(Particle, 1);
@@ -78,6 +81,7 @@ class Particle : public TObject
   fVector m_z;
   
   int m_partID;
+  int m_trkID;
 
 };
 

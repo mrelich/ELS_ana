@@ -1,3 +1,8 @@
+2014-01-31 Matt:
+	* Adding runtime options for MakeTree to make it more modular
+	* Updating what plots will be saved. So far don't fully understand what I am seeing for the charge asym...
+	* Adding runtime options for ReadBack
+
 2014-01-30 Matt:
 	* Saving some tree structure that is working so far.  Will build this analysis up as needed.
 	* Main reason to use the trees is it is faster analysis compared with simple python script.

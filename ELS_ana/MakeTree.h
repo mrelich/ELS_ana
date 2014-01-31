@@ -8,6 +8,8 @@
 #include <string>
 #include <sstream>
 
+using namespace std;
+
 class MakeTree
 {
 
@@ -17,7 +19,7 @@ class MakeTree
   ~MakeTree(){};
 
   // Create tree
-  void CreateTree();
+  void CreateTree(TString inName, TString outname);
 
   // loop over intput file
   void loop(ifstream &input);
@@ -31,6 +33,7 @@ class MakeTree
     part_y.clear();
     part_z.clear();
     part_ID = -1;
+    part_trkID = -1;
     prev_trkID = -1;
   }
 
@@ -45,6 +48,7 @@ class MakeTree
   fVector part_y;
   fVector part_z;
   int part_ID;
+  int part_trkID;
   int prev_trkID;
 
   TFile* m_outfile;

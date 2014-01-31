@@ -3,14 +3,12 @@
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 // Create the Tree
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
-void MakeTree::CreateTree()
+void MakeTree::CreateTree(TString inName, TString outname)
 {
-
+  
   // Input file name
-  //TString infname = "/home/mrelich/workarea/ara/ELS-geant4/elsbeam-geant4-ver140116/sh/demo/energydeposit.dat";
-  //TString infname = "/home/mrelich/workarea/ara/ELS_mrelich/sh/demo/dump_1k_40MeV.dat";
-  TString infname = "/home/mrelich/workarea/ara/ELS_mrelich/sh/demo/ELS_output/dump_100_1TeV.dat";
-  //TString infname = "/home/mrelich/workarea/ara/ELS_mrelich/sh/demo/temp.dat";
+  TString inDir = "/home/mrelich/workarea/ara/ELS_mrelich/sh/demo/ELS_output/"; 
+  TString infname = inDir + inName;
   ifstream input(infname.Data(), ifstream::in);
 
   // first two lines dummy
@@ -19,7 +17,6 @@ void MakeTree::CreateTree()
   //input.getline(dummy,200);
 
   // Create Tree
-  TString outname = "Test.root";
   m_outfile = new TFile(outname.Data(), "recreate");
   m_tree = new TTree("tree","tree");
   m_tree->SetAutoSave(1000000);
@@ -55,13 +52,13 @@ void MakeTree::loop(ifstream & input)
     string strEvent = ss.str();
     size_t found = strEvent.find("Event");
     if( found != string::npos ){
-      cout<<"Getting event: "<<nEvents<<endl;
+      if( nEvents % 100 == 0 ) 
+	cout<<"*** Getting Event: "<<nEvents<<" *** "<<endl;
       setNextEvent(input, nEvents);
     }
-
+    
     // If here we are now ready to fill
     fill();
-
   }
       
   // Save the tree
@@ -88,7 +85,7 @@ void MakeTree::setNextEvent(ifstream &input, int &nEvt)
   int trkID       = 0;
   int motherID    = 0;
   
-  
+  clear();  
   m_event->clear();
   m_event->setEvtNum(nEvt);
 
@@ -108,7 +105,6 @@ void MakeTree::setNextEvent(ifstream &input, int &nEvt)
     string strEvent = ss.str();
     size_t found = strEvent.find("End");
     if( found != string::npos ){
-      cout<<"Ending Event: "<<nEvt<<endl;
       nEvt++;
       if( particle ) 
 	m_event->addParticle( *particle );
@@ -117,12 +113,10 @@ void MakeTree::setNextEvent(ifstream &input, int &nEvt)
 
     // Do this twize
     input.getline(line, 256);
-    ss;
     ss << line;
     strEvent = ss.str();
     found = strEvent.find("End");
     if( found != string::npos ){
-      cout<<"Ending Event: "<<nEvt<<endl;
       nEvt++;
       if( particle ) 
 	m_event->addParticle( *particle );
@@ -141,14 +135,15 @@ void MakeTree::setNextEvent(ifstream &input, int &nEvt)
     }
 
     // Still on same particle
-    if( prev_trkID == trkID ){
+    if( prev_trkID == trkID ){      
       part_x.push_back( xpos );
       part_y.push_back( ypos );
-      part_z.push_back( ypos );
+      part_z.push_back( zpos );
       part_e.push_back( energy );
     }
     else{ // new particle
       particle = new Particle(prev_partID,
+			      prev_trkID,
 			      part_e,
 			      part_x,
 			      part_y,
@@ -161,32 +156,72 @@ void MakeTree::setNextEvent(ifstream &input, int &nEvt)
       // Remember to now add to this batches coords
       part_x.push_back( xpos );
       part_y.push_back( ypos );
-      part_z.push_back( ypos );
+      part_z.push_back( zpos );
       part_e.push_back( energy );
     }
 			      
 
   }
 
-  cout<<"Error: End not found..."<<endl;
-  return;
-
-  //MyEvent* newEvent = new MyEvent(nEvt);
-
-  
+  // Add final particle
+  if(particle)
+    m_event->addParticle( *particle );
+  clear();
 }
 
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
 // Main
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=//
-int main()
+void help()
 {
+  cout<<endl;
+  cout<<endl;
+  cout<<"---------------------------------------------"<<endl;
+  cout<<"-i <string> "<<endl;
+  cout<<"\tSpecify input file name"<<endl;
+  cout<<"-o <string> "<<endl;
+  cout<<"\tSpecify output file name"<<endl;
+  cout<<"-h"<<endl;
+  cout<<"\tThis help menu"<<endl;
+  cout<<"---------------------------------------------"<<endl;
+  cout<<endl;
+  cout<<endl;
+    
+}
+
+
+int main(int argc, char** argv)
+{
+
+  // Need to pass the input and output file name
+  TString inputName  = ""; // .dat
+  TString outputName = ""; // .root
+
+  // loop over inputs
+  for(int i=1; i<argc; ++i){
+    if( strcmp(argv[i], "-i") == 0 )
+      inputName = TString( argv[++i] );
+    else if( strcmp(argv[i], "-o") == 0 )
+      outputName = TString( argv[++i] );
+    else{
+      help();
+      return 0;
+    }
+  }// end loop over options
+
+  // Have check that input and output aren't empty
+  if( inputName.Length() == 0 || outputName.Length() == 0 ){
+    cout<<"InputName and OutputName not specified."<<endl;
+    cout<<"Not running..."<<endl;
+    cout<<"run -h for help menu"<<endl;
+    return 0;
+  }
 
   // Add arguments later
   MakeTree* tree = new MakeTree();
-
-  tree->CreateTree();
+ 
+  tree->CreateTree(inputName, outputName);
 
   delete tree;
 
