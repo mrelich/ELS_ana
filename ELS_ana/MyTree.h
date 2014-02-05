@@ -24,15 +24,20 @@ class Particle : public TObject
   
   // Constructor
   Particle(){};
-  Particle(int partID, int trkID, fVector e, fVector x, fVector y, fVector z){
+  Particle(int partID, int trkID, int procID, fVector e, fVector x, fVector y, fVector z
+	   fVector dE, fVector dX){
+    
     clear();
 
     m_partID = partID;
     m_trkID  = trkID;
+    m_procID = procID;
     m_energy = e;
     m_x = x;
     m_y = y;
     m_z = z;     
+    m_dE = dE;
+    m_dX = dx;
 
   };
 
@@ -59,6 +64,9 @@ class Particle : public TObject
   fVector getZ(){ return m_z; };
   int getPartID(){ return m_partID; };
   int getTrkID(){  return m_trkID; };
+  int getProcID(){ return m_procID; };
+  fVector getdE(){ return m_dE; };
+  fVector getdX(){ return m_dX; };
 
   // Clear method
   void clear(){
@@ -66,11 +74,14 @@ class Particle : public TObject
     m_x.clear();
     m_y.clear();
     m_z.clear();
+    m_dE.clear();
+    m_dX.clear();
     m_partID = -1;
     m_trkID  = -1;
+    m_procID = -1;
   };
 
-  ClassDef(Particle, 1);
+  ClassDef(Particle, 2);
   
  protected:
 
@@ -79,9 +90,12 @@ class Particle : public TObject
   fVector m_x;
   fVector m_y;
   fVector m_z;
-  
+  fVector m_dE;
+  fVector m_dX;
+
   int m_partID;
   int m_trkID;
+  int m_procID;
 
 };
 

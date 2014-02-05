@@ -7,7 +7,8 @@ void MakeTree::CreateTree(TString inName, TString outname)
 {
   
   // Input file name
-  TString inDir = "/home/mrelich/workarea/ara/ELS_mrelich/sh/demo/ELS_output/"; 
+  //TString inDir = "/home/mrelich/workarea/ara/ELS_mrelich/sh/demo/ELS_output/"; 
+  TString inDir = "/home/mrelich/workarea/ara/IceBlock/output/";
   TString infname = inDir + inName;
   ifstream input(infname.Data(), ifstream::in);
 
@@ -84,6 +85,7 @@ void MakeTree::setNextEvent(ifstream &input, int &nEvt)
   int partID      = 0;
   int trkID       = 0;
   int motherID    = 0;
+  int procID      = 0;
   
   clear();  
   m_event->clear();
@@ -92,6 +94,7 @@ void MakeTree::setNextEvent(ifstream &input, int &nEvt)
   Particle* particle = NULL;
   int prev_trkID     = -1;
   int prev_partID    = -1;
+  int prev_procID    = -1;
 
   while( input.good() ){
         
@@ -127,11 +130,13 @@ void MakeTree::setNextEvent(ifstream &input, int &nEvt)
     input.seekg(initial);
     input >> xpos >> ypos >> zpos 
 	  >> stepSize >> energy >> energyDep
-	  >> partID >> trkID >> motherID;
+	  >> partID >> trkID >> motherID 
+	  >> procID;
 
     if(prev_trkID < 0){
       prev_trkID  = trkID;
       prev_partID = partID;
+      prev_procID = procID;
     }
 
     // Still on same particle
@@ -140,27 +145,35 @@ void MakeTree::setNextEvent(ifstream &input, int &nEvt)
       part_y.push_back( ypos );
       part_z.push_back( zpos );
       part_e.push_back( energy );
+      part_dE.push_back( energyDep );
+      part_dX.push_back( stepSize );
     }
     else{ // new particle
       particle = new Particle(prev_partID,
 			      prev_trkID,
+			      prev_procID,
 			      part_e,
 			      part_x,
 			      part_y,
-			      part_z);
+			      part_z,
+			      part_dE,
+			      part_dX);
       m_event->addParticle( *particle );
       clear();
       prev_trkID = trkID;
       prev_partID = partID;
+      prev_procID = procID;
 
       // Remember to now add to this batches coords
       part_x.push_back( xpos );
       part_y.push_back( ypos );
       part_z.push_back( zpos );
       part_e.push_back( energy );
+      part_dE.push_back( energyDep );
+      part_dX.push_back( stepSize );
     }
-			      
-
+    
+    
   }
 
   // Add final particle

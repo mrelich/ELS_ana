@@ -7,6 +7,7 @@
 #include "TVector3.h"
 #include "TFile.h"
 #include "TChain.h"
+#include "TMath.h"
 
 #include <stdio.h>
 #include <iostream>
@@ -14,13 +15,16 @@
 
 typedef unsigned int uint;
 
+static const int m_nProc = 6;
+static const TString m_procNames[m_nProc] = {"misc","eIonization","eBrem","photo","compton","conv"};
+
 class ReadBack
 {
   
  public:
   
   // Constructor / Destructor
-  ReadBack(TString inputFile);
+  ReadBack(TString inputFile, float inputE);
   ~ReadBack();
 
   void looping(){
@@ -60,12 +64,25 @@ class ReadBack
   
   float m_radLength;      // specify radiation length
 
+  float m_beamE;          // input electron energy, assumed as shower energy
+
   TFile* m_output;          // file to save output histograms
 
   // Specify histograms here
   TProfile* p_dVsAvgE;
   TProfile* p_dVsNPart;
   TProfile* p_dVsQDiff;
+
+  TH1F* h_e_prodE;
+  TH1F* h_p_prodE;
+
+  TProfile* p_rVsShowerE; 
+
+  TH1F* h_e_prodE_perProc[m_nProc];
+  TH1F* h_p_prodE_perProc[m_nProc];
+
+
+  TH1F* h_g_prodE;
 
 };
 

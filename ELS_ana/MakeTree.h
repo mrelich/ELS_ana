@@ -35,6 +35,8 @@ class MakeTree
     part_ID = -1;
     part_trkID = -1;
     prev_trkID = -1;
+    part_dE.clear();
+    part_dX.clear();
   }
 
   void fill(){ m_tree->Fill(); };
@@ -47,6 +49,8 @@ class MakeTree
   fVector part_x;
   fVector part_y;
   fVector part_z;
+  fVector part_dE;
+  fVector part_dX;
   int part_ID;
   int part_trkID;
   int prev_trkID;
