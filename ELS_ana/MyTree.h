@@ -24,7 +24,7 @@ class Particle : public TObject
   
   // Constructor
   Particle(){};
-  Particle(int partID, int trkID, int procID, fVector e, fVector x, fVector y, fVector z
+  Particle(int partID, int trkID, int procID, fVector e, fVector x, fVector y, fVector z,
 	   fVector dE, fVector dX){
     
     clear();
@@ -37,7 +37,7 @@ class Particle : public TObject
     m_y = y;
     m_z = z;     
     m_dE = dE;
-    m_dX = dx;
+    m_dX = dX;
 
   };
 
